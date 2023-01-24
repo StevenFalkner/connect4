@@ -21,7 +21,8 @@ const POSITION_BOTTOM: f64 = 400.0;
 
 struct GameStruct {
     board: [[i32;MAXROWS];MAXCOLUMNS],
-    player_turn: i32 // value of 1 or 2, based on the player
+    player_turn: i32,   // 0 if no player turn yet, 1 = player 1's turn, 2 = player 2's turn
+    player_won: i32     // 0 if no winner yet, 1 = player 1 won, 2 = player 2 won, 3 is stalemate
 }
 
 pub struct App {
@@ -33,6 +34,9 @@ impl App {
     const LIGHTGREEN: [f32; 4] = [0.0, 0.3, 0.0, 1.0];
     const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
     const RED: [f32; 4] = [0.8, 0.0, 0.0, 1.0];
+    const GRAYBLACK: [f32; 4] = [0.1, 0.1, 0.1, 1.0];
+    const LIGHTRED: [f32; 4] = [0.3, 0.0, 0.0, 1.0];
+    const PURPLE: [f32; 4] = [0.3, 0.0, 0.3, 1.0];
 
     fn render(&mut self, args: &RenderArgs, game: &GameStruct) {
         use graphics::*;
@@ -40,8 +44,14 @@ impl App {
         let square = rectangle::square(0.0, 0.0, 50.0);
 
         self.gl.draw(args.viewport(), |c, gl| {
+
             // clear the screen
-            clear(Self::DARKGREEN, gl);
+            match game.player_won {
+                1 => clear(Self::LIGHTRED, gl),     // indicate red (human) won
+                2 => clear(Self::GRAYBLACK, gl),    // indicate black (Jesse's superior 1000x AI) won
+                3 => clear(Self::PURPLE, gl),       // stalemate
+                _ => clear(Self::DARKGREEN, gl),    // green field to play
+            }
 
             // draw the game board
             for _row in 0..MAXROWS {
@@ -78,7 +88,8 @@ fn main() {
     // Instantiate game data
     let mut game = GameStruct {
         board: [[0;MAXROWS];MAXCOLUMNS],
-        player_turn: 1
+        player_turn: 1,
+        player_won: 0
     };
 
     // hard coded samples to demo the UI
@@ -103,26 +114,36 @@ fn main() {
     };
 
     let mut events = Events::new(EventSettings::new());
-    let mut success: bool = false;
+    let mut coin_placed: bool = false;
 
     while let Some(e) = events.next(&mut window) {
 
         // user input
+        game.player_turn = 1;
+
         if let Some(Button::Keyboard(key)) = e.press_args() {
             match key {
-                Key::D1 => success = add_coin_to_column(&mut game, 0),
-                Key::D2 => success = add_coin_to_column(&mut game, 1),
-                Key::D3 => success = add_coin_to_column(&mut game, 2),
-                Key::D4 => success = add_coin_to_column(&mut game, 3),
-                Key::D5 => success = add_coin_to_column(&mut game, 4),
-                Key::D6 => success = add_coin_to_column(&mut game, 5),
-                Key::D7 => success = add_coin_to_column(&mut game, 6),
+                Key::D1 => coin_placed = add_coin_to_column(&mut game, 0),
+                Key::D2 => coin_placed = add_coin_to_column(&mut game, 1),
+                Key::D3 => coin_placed = add_coin_to_column(&mut game, 2),
+                Key::D4 => coin_placed = add_coin_to_column(&mut game, 3),
+                Key::D5 => coin_placed = add_coin_to_column(&mut game, 4),
+                Key::D6 => coin_placed = add_coin_to_column(&mut game, 5),
+                Key::D7 => coin_placed = add_coin_to_column(&mut game, 6),
                 _ => {}
             }
 
-            // flip the player to the AI player
-            if success {
-                // call into Jesse's AI code.
+            if coin_placed {
+                game.player_won = game_finished(&game);
+
+                // AI turn
+                if game.player_won == 0 {
+                    game.player_turn = 2;
+
+                    // todo: call Jesse's AI code.
+
+                    game.player_won = game_finished(&game);
+                }
             }
         }
 
@@ -148,5 +169,12 @@ fn add_coin_to_column(game: &mut GameStruct, col: usize) -> bool {
     // sample code:
     game.board[col][5] = 1;
 
-    return false;
+    return true;
+}
+
+fn game_finished(_game: &GameStruct) -> i32 {
+    
+    // Jesse
+
+    return 0;
 }
