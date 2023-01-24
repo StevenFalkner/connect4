@@ -7,7 +7,7 @@ extern crate device_query;
 use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
-use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
+use piston::input::{RenderArgs, RenderEvent, PressEvent, Button, Key};
 use piston::window::WindowSettings;
 
 const MAXCOLUMNS: usize = 7;
@@ -19,9 +19,10 @@ const BLOCK_SPACING: f64 = 10.0;
 const POSITION_LEFT: f64 = 150.0;
 const POSITION_BOTTOM: f64 = 400.0;
 
-pub struct GameStruct {
+struct GameStruct {
     board: [[i32;MAXROWS];MAXCOLUMNS],
-    player_turn: i32 // value of 1 or 2, based on the player
+    player_turn: i32,   // 0 if no player turn yet; value of 1 or 2 if someone's turn
+    player_won: i32     // 0 if no winner yet; value of 1 or 2 if someone won
 }
 
 pub struct App {
@@ -33,17 +34,22 @@ impl App {
     const LIGHTGREEN: [f32; 4] = [0.0, 0.3, 0.0, 1.0];
     const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
     const RED: [f32; 4] = [0.8, 0.0, 0.0, 1.0];
+    const GRAYBLACK: [f32; 4] = [0.1, 0.1, 0.1, 1.0];
+    const LIGHTRED: [f32; 4] = [0.3, 0.0, 0.0, 1.0];
 
     fn render(&mut self, args: &RenderArgs, game: &GameStruct) {
         use graphics::*;
 
         let square = rectangle::square(0.0, 0.0, 50.0);
-        let window_size_x = args.window_size[0];
-        let window_size_y = args.window_size[1];
 
         self.gl.draw(args.viewport(), |c, gl| {
+
             // clear the screen
-            clear(Self::DARKGREEN, gl);
+            match game.player_won {
+                1 => clear(Self::LIGHTRED, gl),     // indicate red (human) won
+                2 => clear(Self::GRAYBLACK, gl),    // indicate black (Jesse's superior 1000x AI) won
+                _ => clear(Self::DARKGREEN, gl),    // green field to play
+            }
 
             // draw the game board
             for _row in 0..MAXROWS {
@@ -74,11 +80,14 @@ impl App {
     // }
 }
 
+
 fn main() {
 
+    // Instantiate game data
     let mut game = GameStruct {
         board: [[0;MAXROWS];MAXCOLUMNS],
-        player_turn: 1
+        player_turn: 1,
+        player_won: 0
     };
 
 
@@ -103,7 +112,45 @@ fn main() {
     };
 
     let mut events = Events::new(EventSettings::new());
+    let mut coin_placed: bool = false;
+    let mut winning_condition: i32;
+
     while let Some(e) = events.next(&mut window) {
+
+        // user input
+        game.player_turn = 1;
+
+        if let Some(Button::Keyboard(key)) = e.press_args() {
+            match key {
+                Key::D1 => coin_placed = add_coin_to_column(&mut game, 0),
+                Key::D2 => coin_placed = add_coin_to_column(&mut game, 1),
+                Key::D3 => coin_placed = add_coin_to_column(&mut game, 2),
+                Key::D4 => coin_placed = add_coin_to_column(&mut game, 3),
+                Key::D5 => coin_placed = add_coin_to_column(&mut game, 4),
+                Key::D6 => coin_placed = add_coin_to_column(&mut game, 5),
+                Key::D7 => coin_placed = add_coin_to_column(&mut game, 6),
+                _ => {}
+            }
+
+            if coin_placed {
+                winning_condition = game_finished(&game);
+                if winning_condition == 1 {
+                    game.player_won = 1;
+                }
+
+                // AI turn
+                if winning_condition == 0 {
+                    game.player_turn = 2;
+                    // call Jesse's AI code.
+                    winning_condition = game_finished(&game);
+                    if winning_condition == 2 {
+                        game.player_won = 2;
+                    }
+                }
+            }
+        }
+
+        // render graphics
         if let Some(args) = e.render_args() {
             app.render(&args, &game);
         }
@@ -131,4 +178,24 @@ fn main() {
         }
         return true;
     }
+}
+
+fn add_coin_to_column(game: &mut GameStruct, col: usize) -> bool {
+
+    // Harshini
+    // check if column is full.
+    // if full then return false (user needs to pick again)
+    // else populate the coin on the board, using gravity.
+
+    // sample code:
+    game.board[col][5] = 1;
+
+    return true;
+}
+
+fn game_finished(game: &GameStruct) -> i32 {
+
+    // Jesse
+
+    return 0;
 }
