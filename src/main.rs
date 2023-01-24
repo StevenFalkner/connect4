@@ -2,12 +2,14 @@ extern crate glutin_window;
 extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
+extern crate device_query;
 
 use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
-use piston::window::WindowSettings; 
+use piston::window::WindowSettings;
+use device_query::{DeviceEvents, DeviceState};
 
 const MAXCOLUMNS: usize = 7;
 const MAXROWS: usize = 6;
@@ -42,7 +44,7 @@ impl App {
             // draw the game board
             for _row in 0..MAXROWS {
                 for _col in 0..MAXCOLUMNS {
-        
+
                     let transform1 = c
                         .transform
                         .trans(x, y)
@@ -75,10 +77,29 @@ fn main() {
         playerTurn: 1
     };
 
-    game.board[0][0] = 1;
+    let device_state = DeviceState::new();
+
+    let _guard = device_state.on_mouse_move(|position| {
+        println!("Mouse position: {:#?}", position);
+    });
+    let _guard = device_state.on_mouse_down(|button| {
+        println!("Mouse button down: {:#?}", button);
+    });
+    let _guard = device_state.on_mouse_up(|button| {
+        println!("Mouse button up: {:#?}", button);
+    });
+    let _guard = device_state.on_key_down(|key| {
+        println!("Keyboard key down: {:#?}", key);
+    });
+    let _guard = device_state.on_key_up(|key| {
+        println!("Keyboard key up: {:#?}", key);
+    });
+
+
+    game.board[0][1] = 1;
     game.board[1][2] = 2;
     game.board[MAXCOLUMNS-1][MAXROWS-1] = 2;
-    
+
 
     // Change this to OpenGL::V2_1 if not working.
     let opengl = OpenGL::V3_2;
@@ -105,4 +126,5 @@ fn main() {
         //     app.update(&args);
         // }
     }
+
 }
