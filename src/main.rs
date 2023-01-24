@@ -7,7 +7,7 @@ use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
-use piston::window::WindowSettings; 
+use piston::window::WindowSettings;
 
 const MAXCOLUMNS: usize = 7;
 const MAXROWS: usize = 6;
@@ -42,7 +42,7 @@ impl App {
             // draw the game board
             for _row in 0..MAXROWS {
                 for _col in 0..MAXCOLUMNS {
-        
+
                     let transform1 = c
                         .transform
                         .trans(x, y)
@@ -78,7 +78,7 @@ fn main() {
     game.board[0][0] = 1;
     game.board[1][2] = 2;
     game.board[MAXCOLUMNS-1][MAXROWS-1] = 2;
-    
+
 
     // Change this to OpenGL::V2_1 if not working.
     let opengl = OpenGL::V3_2;
@@ -104,5 +104,24 @@ fn main() {
         // if let Some(args) = e.update_args() {
         //     app.update(&args);
         // }
+    }
+
+    /// .
+    // Harshini
+    // check if column is full.
+    // if full then return false (user needs to pick again)
+    // else populate the coin on the board, using gravity.
+    fn add_coin_to_column(game: &mut GameStruct, col: usize) -> bool {
+        // check the col is not max and the column is not full
+        if col > MAXCOLUMNS-1 || game.board[col][MAXCOLUMNS-1] != 0 {
+            return false;
+        }
+
+        for n in 0..MAXROWS-1 {
+            if game.board[col][n] != 0 { //if there is empty spot then make sure the coin takes the bottom empty spot
+                game.board[col][n] = game.playerTurn;
+            }
+        }
+        return true;
     }
 }
