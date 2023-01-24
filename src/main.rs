@@ -214,7 +214,7 @@ fn get_ai_choice(game: &mut GameStruct) -> i32 {
 }
 
 fn is_column_empty(game: &mut GameStruct, column_number: i32) -> bool {
-    if game.board[column_number as usize][1] == 0 {
+    if game.board[column_number as usize][5] == 0 {
         return true;
     }
     return false;
