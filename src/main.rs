@@ -109,18 +109,19 @@ fn main() {
         // user input
         if let Some(Button::Keyboard(key)) = e.press_args() {
             match key {
-                Key::D1 => success = AddCoinToColumn(&game, 0),
-                Key::D2 => game.board[1][4] = 1,
-                Key::D3 => game.board[2][4] = 1,
-                Key::D4 => game.board[3][4] = 1,
-                Key::D5 => game.board[4][4] = 1,
-                Key::D6 => game.board[5][4] = 1,
-                Key::D7 => game.board[6][4] = 1,
+                Key::D1 => success = add_coin_to_column(&mut game, 0),
+                Key::D2 => success = add_coin_to_column(&mut game, 1),
+                Key::D3 => success = add_coin_to_column(&mut game, 2),
+                Key::D4 => success = add_coin_to_column(&mut game, 3),
+                Key::D5 => success = add_coin_to_column(&mut game, 4),
+                Key::D6 => success = add_coin_to_column(&mut game, 5),
+                Key::D7 => success = add_coin_to_column(&mut game, 6),
                 _ => {}
             }
 
-            if (success) {
-                // do something
+            // flip the player to the AI player
+            if success {
+                // call into Jesse's AI code.
             }
         }
 
@@ -135,14 +136,15 @@ fn main() {
     }
 }
 
-fn AddCoinToColumn(game: &GameStruct, col: u32) -> bool {
+fn add_coin_to_column(game: &mut GameStruct, col: usize) -> bool {
     
     // Harshini
     // check if column is full.  
     // if full then return false (user needs to pick again)
     // else populate the coin on the board, using gravity.
 
-    //game.board[col][5] = 1;
+    // sample code:
+    game.board[col][5] = 1;
 
     return false;
 }
