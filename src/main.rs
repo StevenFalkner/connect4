@@ -118,11 +118,6 @@ fn main() {
     let mut events = Events::new(EventSettings::new());
     let mut coin_placed: bool = false;
 
-// TODO remove call of get_ai_choice here
-    // let ai_choice: i32 = get_ai_choice(&mut game);
-    // println!("ai_choice = {}", ai_choice);
-
-
     while let Some(e) = events.next(&mut window) {
 
         // user input
@@ -141,7 +136,7 @@ fn main() {
             }
 
             if coin_placed {
-                game.player_won = game_finished(&game);
+                game.player_won = game_finished(&mut game);
 
                 // AI turn
                 if game.player_won == 0 {
@@ -150,11 +145,9 @@ fn main() {
                     let ai_choice: i32 = get_ai_choice(&mut game);
                     if ai_choice >= 0 {
                         add_coin_to_column(&mut game, ai_choice as usize);
-                    } else {
-                        // TODO failure if could not place coin
                     }
 
-                    game.player_won = game_finished(&game);
+                    game.player_won = game_finished(&mut game);
                 }
             }
         }
@@ -232,7 +225,7 @@ fn get_ai_choice(game: &mut GameStruct) -> i32 {
 }
 
 fn is_column_empty(game: &mut GameStruct, column_number: i32) -> bool {
-    if game.board[1][column_number as usize] == 0 {
+    if game.board[column_number as usize][1] == 0 {
         return true;
     }
     return false;
@@ -251,7 +244,7 @@ fn game_won(game: &mut GameStruct, player: i32) -> bool {
         }
     }
     // Horizontal check
-    for row in 0..7 {
+    for row in 0..6 {
         for col in 0..4 {
             if game.board[col][row] == player &&
                 game.board[col+1][row] == player &&
@@ -287,4 +280,4 @@ fn game_won(game: &mut GameStruct, player: i32) -> bool {
     }
     // Player did not win
     return false;
-}// 
+}//
