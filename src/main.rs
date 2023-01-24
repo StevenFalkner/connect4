@@ -124,7 +124,7 @@ fn main() {
                 Key::D5 => coin_placed = add_coin_to_column(&mut game, 4),
                 Key::D6 => coin_placed = add_coin_to_column(&mut game, 5),
                 Key::D7 => coin_placed = add_coin_to_column(&mut game, 6),
-                _ => {}
+                _       => coin_placed = false
             }
 
             if coin_placed {
