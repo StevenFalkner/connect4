@@ -20,8 +20,8 @@ const POSITION_BOTTOM: f64 = 400.0;
 
 struct GameStruct {
     board: [[i32;MAXROWS];MAXCOLUMNS],
-    player_turn: i32,   // 0 if no player turn yet; value of 1 or 2 if someone's turn
-    player_won: i32     // 0 if no winner yet; value of 1 or 2 if someone won
+    player_turn: i32,   // 0 if no player turn yet, 1 = player 1's turn, 2 = player 2's turn
+    player_won: i32     // 0 if no winner yet, 1 = player 1 won, 2 = player 2 won, 3 is stalemate
 }
 
 pub struct App {
@@ -35,6 +35,7 @@ impl App {
     const RED: [f32; 4] = [0.8, 0.0, 0.0, 1.0];
     const GRAYBLACK: [f32; 4] = [0.1, 0.1, 0.1, 1.0];
     const LIGHTRED: [f32; 4] = [0.3, 0.0, 0.0, 1.0];
+    const PURPLE: [f32; 4] = [0.3, 0.0, 0.3, 1.0];
 
     fn render(&mut self, args: &RenderArgs, game: &GameStruct) {
         use graphics::*;
@@ -47,6 +48,7 @@ impl App {
             match game.player_won {
                 1 => clear(Self::LIGHTRED, gl),     // indicate red (human) won
                 2 => clear(Self::GRAYBLACK, gl),    // indicate black (Jesse's superior 1000x AI) won
+                3 => clear(Self::PURPLE, gl),       // stalemate
                 _ => clear(Self::DARKGREEN, gl),    // green field to play
             }
 
@@ -112,7 +114,6 @@ fn main() {
 
     let mut events = Events::new(EventSettings::new());
     let mut coin_placed: bool = false;
-    let mut winning_condition: i32;
 
     while let Some(e) = events.next(&mut window) {
 
@@ -132,19 +133,15 @@ fn main() {
             }
 
             if coin_placed {
-                winning_condition = game_finished(&game);
-                if winning_condition == 1 {
-                    game.player_won = 1;
-                }
+                game.player_won = game_finished(&game);
 
                 // AI turn
-                if winning_condition == 0 {
+                if game.player_won == 0 {
                     game.player_turn = 2;
-                    // call Jesse's AI code.
-                    winning_condition = game_finished(&game);
-                    if winning_condition == 2 {
-                        game.player_won = 2;
-                    }
+
+                    // todo: call Jesse's AI code.
+
+                    game.player_won = game_finished(&game);
                 }
             }
         }
@@ -180,7 +177,7 @@ fn main() {
     }
 }
 
-fn game_finished(game: &GameStruct) -> i32 {
+fn game_finished(_game: &GameStruct) -> i32 {
 
     // Jesse
 
