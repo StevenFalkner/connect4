@@ -5,7 +5,6 @@ extern crate piston;
 extern crate rand;
 
 use glutin_window::GlutinWindow as Window;
-use graphics::ellipse;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, PressEvent, Button, Key};
