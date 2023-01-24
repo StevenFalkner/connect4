@@ -91,9 +91,9 @@ fn main() {
     };
 
 
-    game.board[0][1] = 1;
-    game.board[1][2] = 2;
-    game.board[MAXCOLUMNS-1][MAXROWS-1] = 2;
+    //game.board[0][1] = 1;
+    //game.board[1][2] = 2;
+    //game.board[MAXCOLUMNS-1][MAXROWS-1] = 2;
 
 
     // Change this to OpenGL::V2_1 if not working.
@@ -166,8 +166,9 @@ fn main() {
     // if full then return false (user needs to pick again)
     // else populate the coin on the board, using gravity.
     fn add_coin_to_column(game: &mut GameStruct, col: usize) -> bool {
+        print!("{}", col);
         // check the col is not max and the column is not full
-        if col > MAXCOLUMNS-1 || game.board[col][MAXCOLUMNS-1] != 0 {
+        if col > MAXCOLUMNS-1 || game.board[col][MAXROWS-1] != 0 {
             return false;
         }
 
@@ -178,19 +179,6 @@ fn main() {
         }
         return true;
     }
-}
-
-fn add_coin_to_column(game: &mut GameStruct, col: usize) -> bool {
-
-    // Harshini
-    // check if column is full.
-    // if full then return false (user needs to pick again)
-    // else populate the coin on the board, using gravity.
-
-    // sample code:
-    game.board[col][5] = 1;
-
-    return true;
 }
 
 fn game_finished(game: &GameStruct) -> i32 {
