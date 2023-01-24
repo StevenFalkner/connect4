@@ -10,13 +10,21 @@ use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
 use piston::window::WindowSettings;
 use device_query::{DeviceEvents, DeviceState};
+use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent, PressEvent};
+use piston::window::WindowSettings;
 
 const MAXCOLUMNS: usize = 7;
 const MAXROWS: usize = 6;
 
+// Render constants
+const BLOCK_SIZE: f64 = 50.0;
+const BLOCK_SPACING: f64 = 10.0;
+const POSITION_LEFT: f64 = 150.0;
+const POSITION_BOTTOM: f64 = 400.0;
+
 pub struct GameStruct {
     board: [[i32;MAXROWS];MAXCOLUMNS],
-    playerTurn: i32 // value of 1 or 2, based on the player
+    player_turn: i32 // value of 1 or 2, based on the player
 }
 
 pub struct App {
@@ -35,7 +43,6 @@ impl App {
         let square = rectangle::square(0.0, 0.0, 50.0);
         let window_size_x = args.window_size[0];
         let window_size_y = args.window_size[1];
-        let (x,y) = (window_size_x / 4.0, window_size_y / 1.25);
 
         self.gl.draw(args.viewport(), |c, gl| {
             // clear the screen
@@ -47,8 +54,8 @@ impl App {
 
                     let transform1 = c
                         .transform
-                        .trans(x, y)
-                        .trans(60.0 * (_col as f64) - 50.0, -60.0 * (_row as f64) - 50.0);
+                        .trans(POSITION_LEFT, POSITION_BOTTOM)
+                        .trans((BLOCK_SIZE + BLOCK_SPACING) * (_col as f64) - BLOCK_SIZE, -60.0 * (_row as f64) - BLOCK_SIZE);
 
                     // Draw a box around the middle of the screen.
                     if game.board[_col][_row] == 1 {
@@ -74,7 +81,7 @@ fn main() {
 
     let mut game = GameStruct {
         board: [[0;MAXROWS];MAXCOLUMNS],
-        playerTurn: 1
+        player_turn: 1
     };
 
     let device_state = DeviceState::new();
@@ -104,7 +111,7 @@ fn main() {
     // Change this to OpenGL::V2_1 if not working.
     let opengl = OpenGL::V3_2;
 
-    // Create a Glutin window.
+    // Create a Glutin window (which is the Piston backing window)
     let mut window: Window = WindowSettings::new("Connect-4", [600, 500])
         .graphics_api(opengl)
         .exit_on_esc(true)
