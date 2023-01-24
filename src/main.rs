@@ -6,7 +6,7 @@ extern crate piston;
 use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
-use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent, PressEvent};
+use piston::input::{RenderArgs, RenderEvent, PressEvent, Button, Key};
 use piston::window::WindowSettings; 
 
 const MAXCOLUMNS: usize = 7;
@@ -18,7 +18,7 @@ const BLOCK_SPACING: f64 = 10.0;
 const POSITION_LEFT: f64 = 150.0;
 const POSITION_BOTTOM: f64 = 400.0;
 
-pub struct GameStruct {
+struct GameStruct {
     board: [[i32;MAXROWS];MAXCOLUMNS],
     player_turn: i32 // value of 1 or 2, based on the player
 }
@@ -37,8 +37,6 @@ impl App {
         use graphics::*;
 
         let square = rectangle::square(0.0, 0.0, 50.0);
-        let window_size_x = args.window_size[0];
-        let window_size_y = args.window_size[1];
 
         self.gl.draw(args.viewport(), |c, gl| {
             // clear the screen
@@ -73,13 +71,16 @@ impl App {
     // }
 }
 
+
 fn main() {
 
+    // Instantiate game data
     let mut game = GameStruct {
         board: [[0;MAXROWS];MAXCOLUMNS],
         player_turn: 1
     };
 
+    // hard coded samples to demo the UI
     game.board[0][0] = 1;
     game.board[1][2] = 2;
     game.board[MAXCOLUMNS-1][MAXROWS-1] = 2;
@@ -101,7 +102,29 @@ fn main() {
     };
 
     let mut events = Events::new(EventSettings::new());
+    let mut success: bool = false;
+
     while let Some(e) = events.next(&mut window) {
+
+        // user input
+        if let Some(Button::Keyboard(key)) = e.press_args() {
+            match key {
+                Key::D1 => success = AddCoinToColumn(&game, 0),
+                Key::D2 => game.board[1][4] = 1,
+                Key::D3 => game.board[2][4] = 1,
+                Key::D4 => game.board[3][4] = 1,
+                Key::D5 => game.board[4][4] = 1,
+                Key::D6 => game.board[5][4] = 1,
+                Key::D7 => game.board[6][4] = 1,
+                _ => {}
+            }
+
+            if (success) {
+                // do something
+            }
+        }
+
+        // render graphics
         if let Some(args) = e.render_args() {
             app.render(&args, &game);
         }
@@ -110,4 +133,16 @@ fn main() {
         //     app.update(&args);
         // }
     }
+}
+
+fn AddCoinToColumn(game: &GameStruct, col: u32) -> bool {
+    
+    // Harshini
+    // check if column is full.  
+    // if full then return false (user needs to pick again)
+    // else populate the coin on the board, using gravity.
+
+    //game.board[col][5] = 1;
+
+    return false;
 }
