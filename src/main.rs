@@ -75,10 +75,6 @@ impl App {
             }
         });
     }
-
-    // fn update(&mut self, args: &UpdateArgs) {
-    //     //user input??
-    // }
 }
 
 
@@ -91,12 +87,11 @@ fn main() {
         player_won: 0
     };
 
-    // hard coded samples to demo the UI
-    game.board[0][0] = 1;
-    game.board[1][2] = 2;
-    game.board[MAXCOLUMNS-1][MAXROWS-1] = 2;
+    // // hard coded samples to demo the UI
+    // game.board[0][0] = 1;
+    // game.board[1][2] = 2;
+    // game.board[MAXCOLUMNS-1][MAXROWS-1] = 2;
     
-
     // Change this to OpenGL::V2_1 if not working.
     let opengl = OpenGL::V3_2;
 

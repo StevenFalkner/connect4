@@ -2,7 +2,7 @@
 name = "connect4"
 version = "0.1.0"
 authors = [
-    "Steven Falkner <steven.falkner@gmail.com>",
+    "Steven Falkner <stevenfalkner@gmail.com>",
     "Harshini Inturi <harshini.inturi@cerner.com>",
     "Jesse Kipper <jesse.kipper@cerner.com>",
     "Yomi Oluwadara <yomi.oluwadara@cerner.com>"
