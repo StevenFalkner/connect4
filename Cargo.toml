@@ -1,0 +1,17 @@
+[package]
+name = "connect4"
+version = "0.1.0"
+authors = [
+    "Steven Falkner <steve.falkner@oracle.com>"
+]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "connect4"
+
+[dependencies]
+piston = "0.53"
+piston2d-graphics = "0.43.0"
+pistoncore-glutin_window = "0.70.1"
+piston2d-opengl_graphics = "0.82.0"
