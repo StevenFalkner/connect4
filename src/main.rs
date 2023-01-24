@@ -2,12 +2,14 @@ extern crate glutin_window;
 extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
+extern crate rand;
 
 use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, PressEvent, Button, Key};
 use piston::window::WindowSettings;
+use rand::Rng;
 
 const MAXCOLUMNS: usize = 7;
 const MAXROWS: usize = 6;
@@ -104,6 +106,11 @@ fn main() {
     let mut events = Events::new(EventSettings::new());
     let mut success: bool = false;
 
+// TODO remove call of get_ai_choice here
+    let ai_choice: i32 = get_ai_choice(&mut game);
+    println!("ai_choice = {}", ai_choice);
+
+
     while let Some(e) = events.next(&mut window) {
 
         // user input
@@ -121,7 +128,12 @@ fn main() {
 
             // flip the player to the AI player
             if success {
-                // call into Jesse's AI code.
+                let ai_choice: i32 = get_ai_choice(&mut game);
+                if ai_choice >= 0 {
+                    success = add_coin_to_column(&mut game, ai_choice as usize);
+                } else {
+                    // TODO failure if could not place coin
+                }
             }
         }
 
@@ -149,3 +161,31 @@ fn add_coin_to_column(game: &mut GameStruct, col: usize) -> bool {
     return false;
 }
 
+/*
+get_ai_choice randomly determines which column the ai chooses. If the column is already filled it will retry until an
+an available column is found. Columns returned will be 0 - 6. If all columns are filled it will return -1
+ */
+fn get_ai_choice(game: &mut GameStruct) -> i32 {
+    let mut tried_columns: [bool; 7] = [false, false, false, false, false, false, false];
+    let ai_selection: i32 = loop {
+        let col_index = rand::thread_rng().gen_range(0..7);
+        if tried_columns[col_index] == false {
+            println!("column number: {}", col_index);
+            if is_column_empty(col_index as i32) {
+                println!("column empty: ");
+                break col_index as i32;
+            }
+            println!("column not empty: ");
+            tried_columns[col_index] = true;
+        }
+        if ! tried_columns.contains(&false) {
+            // can't move, return -1
+            break -1;
+        }
+    };
+    return ai_selection;
+}
+
+fn is_column_empty(column_number: i32) -> bool {
+    return rand::thread_rng().gen_bool(0.1);
+}
