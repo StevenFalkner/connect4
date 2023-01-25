@@ -77,10 +77,6 @@ impl App {
             }
         });
     }
-
-    // fn update(&mut self, args: &UpdateArgs) {
-    //     //user input??
-    // }
 }
 
 
@@ -92,13 +88,7 @@ fn main() {
         player_turn: 1,
         player_won: 0
     };
-
-    // hard coded samples to demo the UI
-    game.board[0][0] = 1;
-    game.board[1][2] = 2;
-    game.board[MAXCOLUMNS-1][MAXROWS-1] = 2;
-
-
+    
     // Change this to OpenGL::V2_1 if not working.
     let opengl = OpenGL::V3_2;
 
@@ -131,7 +121,7 @@ fn main() {
                 Key::D5 => coin_placed = add_coin_to_column(&mut game, 4),
                 Key::D6 => coin_placed = add_coin_to_column(&mut game, 5),
                 Key::D7 => coin_placed = add_coin_to_column(&mut game, 6),
-                _ => {}
+                _       => coin_placed = false
             }
 
             if coin_placed {
@@ -224,7 +214,7 @@ fn get_ai_choice(game: &mut GameStruct) -> i32 {
 }
 
 fn is_column_empty(game: &mut GameStruct, column_number: i32) -> bool {
-    if game.board[column_number as usize][1] == 0 {
+    if game.board[column_number as usize][5] == 0 {
         return true;
     }
     return false;
