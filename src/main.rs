@@ -88,7 +88,7 @@ fn main() {
         player_turn: 1,
         player_won: 0
     };
-    
+
     // Change this to OpenGL::V2_1 if not working.
     let opengl = OpenGL::V3_2;
 
@@ -150,19 +150,26 @@ fn main() {
         //     app.update(&args);
         // }
     }
-}
 
-fn add_coin_to_column(game: &mut GameStruct, col: usize) -> bool {
-
+    /// .
     // Harshini
     // check if column is full.
     // if full then return false (user needs to pick again)
     // else populate the coin on the board, using gravity.
+    fn add_coin_to_column(game: &mut GameStruct, col: usize) -> bool {
+        // check the col is not max and the column is not full
+        if col > MAXCOLUMNS-1 || game.board[col][MAXROWS-1] != 0 {
+            return false;
+        }
 
-    // sample code:
-    game.board[col][5] = 1;
-
-    return true;
+        for n in 0..MAXROWS {
+            if game.board[col][n] == 0 { //if there is empty spot then make sure the coin takes the bottom empty spot
+                game.board[col][n] = game.player_turn;
+                break;
+            }
+        }
+        return true;
+    }
 }
 
 /*
