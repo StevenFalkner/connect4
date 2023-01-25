@@ -162,15 +162,15 @@ fn main() {
     // if full then return false (user needs to pick again)
     // else populate the coin on the board, using gravity.
     fn add_coin_to_column(game: &mut GameStruct, col: usize) -> bool {
-        print!("{}", col);
         // check the col is not max and the column is not full
         if col > MAXCOLUMNS-1 || game.board[col][MAXROWS-1] != 0 {
             return false;
         }
 
-        for n in 0..MAXROWS-1 {
-            if game.board[col][n] != 0 { //if there is empty spot then make sure the coin takes the bottom empty spot
+        for n in 0..MAXROWS {
+            if game.board[col][n] == 0 { //if there is empty spot then make sure the coin takes the bottom empty spot
                 game.board[col][n] = game.player_turn;
+                break;
             }
         }
         return true;
