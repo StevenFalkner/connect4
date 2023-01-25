@@ -2,12 +2,14 @@ extern crate glutin_window;
 extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
+extern crate rand;
 
 use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, PressEvent, Button, Key};
 use piston::window::WindowSettings;
+use rand::Rng;
 
 const MAXCOLUMNS: usize = 7;
 const MAXROWS: usize = 6;
@@ -75,10 +77,6 @@ impl App {
             }
         });
     }
-
-    // fn update(&mut self, args: &UpdateArgs) {
-    //     //user input??
-    // }
 }
 
 
@@ -90,12 +88,6 @@ fn main() {
         player_turn: 1,
         player_won: 0
     };
-
-
-    //game.board[0][1] = 1;
-    //game.board[1][2] = 2;
-    //game.board[MAXCOLUMNS-1][MAXROWS-1] = 2;
-
 
     // Change this to OpenGL::V2_1 if not working.
     let opengl = OpenGL::V3_2;
@@ -129,19 +121,22 @@ fn main() {
                 Key::D5 => coin_placed = add_coin_to_column(&mut game, 4),
                 Key::D6 => coin_placed = add_coin_to_column(&mut game, 5),
                 Key::D7 => coin_placed = add_coin_to_column(&mut game, 6),
-                _ => {}
+                _       => coin_placed = false
             }
 
             if coin_placed {
-                game.player_won = game_finished(&game);
+                game.player_won = game_finished(&mut game);
 
                 // AI turn
                 if game.player_won == 0 {
                     game.player_turn = 2;
 
-                    // todo: call Jesse's AI code.
+                    let ai_choice: i32 = get_ai_choice(&mut game);
+                    if ai_choice >= 0 {
+                        add_coin_to_column(&mut game, ai_choice as usize);
+                    }
 
-                    game.player_won = game_finished(&game);
+                    game.player_won = game_finished(&mut game);
                 }
             }
         }
@@ -177,9 +172,108 @@ fn main() {
     }
 }
 
-fn game_finished(_game: &GameStruct) -> i32 {
+/*
+    game_finished determines whether the game is done and returns one of four values:
+    0 - game is not finished
+    1 - player won
+    2 - AI won
+    3 - stalemate
+*/
+fn game_finished(game: &mut GameStruct) -> i32 {
+    // check for player 1 win
+    if game_won(game, 1) {
+        return 1;
+    }
+    // check for player 2 win
+    if game_won(game, 2) {
+        return 2;
+    }
+    // check for open columns
+    for col in 0..7 {
+        if game.board[col][1] == 0 {
+            return 0
+        }
+    }
 
-    // Jesse
-
-    return 0;
+    return 3;
 }
+
+/*
+get_ai_choice randomly determines which column the ai chooses. If the column is already filled it will retry until an
+an available column is found. Columns returned will be 0 - 6. If all columns are filled it will return -1
+ */
+fn get_ai_choice(game: &mut GameStruct) -> i32 {
+    let mut tried_columns: [bool; 7] = [false, false, false, false, false, false, false];
+    let ai_selection: i32 = loop {
+        let col_index = rand::thread_rng().gen_range(0..7);
+        if tried_columns[col_index] == false {
+            if is_column_empty(game, col_index as i32) {
+                break col_index as i32;
+            }
+            tried_columns[col_index] = true;
+        }
+        if ! tried_columns.contains(&false) {
+            // can't move, return -1
+            break -1;
+        }
+    };
+    return ai_selection;
+}
+
+fn is_column_empty(game: &mut GameStruct, column_number: i32) -> bool {
+    if game.board[column_number as usize][5] == 0 {
+        return true;
+    }
+    return false;
+}
+
+fn game_won(game: &mut GameStruct, player: i32) -> bool {
+    // Vertical check
+    for col in 0..7 {
+        for row in 0..3 {
+            if game.board[col][row] == player &&
+                game.board[col][row+1] == player &&
+                game.board[col][row+2] == player &&
+                game.board[col][row+3] == player {
+                    return true;
+                }
+        }
+    }
+    // Horizontal check
+    for row in 0..6 {
+        for col in 0..4 {
+            if game.board[col][row] == player &&
+                game.board[col+1][row] == player &&
+                game.board[col+2][row] == player &&
+                game.board[col+3][row] == player {
+                    return true;
+                }
+        }
+    }
+
+    // Ascending diagonal check
+    for col in 3..7 {
+        for row in 0..3 {
+            if game.board[col][row] == player &&
+                game.board[col-1][row+1] == player &&
+                game.board[col-2][row+2] == player &&
+                game.board[col-3][row+3] == player {
+                    return true;
+                }
+        }
+    }
+
+    // Decending diagonal check
+    for col in 3..7 {
+        for row in 3..6 {
+            if game.board[col][row] == player &&
+                game.board[col-1][row-1] == player &&
+                game.board[col-2][row-2] == player &&
+                game.board[col-3][row-3] == player {
+                    return true;
+                }
+        }
+    }
+    // Player did not win
+    return false;
+}//
