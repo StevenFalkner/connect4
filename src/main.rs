@@ -105,7 +105,7 @@ fn main() {
     };
 
     let mut events = Events::new(EventSettings::new());
-    let mut coin_placed: bool = false;
+    let mut coin_placed: bool;
 
     while let Some(e) = events.next(&mut window) {
 
@@ -121,6 +121,7 @@ fn main() {
                 Key::D5 => coin_placed = add_coin_to_column(&mut game, 4),
                 Key::D6 => coin_placed = add_coin_to_column(&mut game, 5),
                 Key::D7 => coin_placed = add_coin_to_column(&mut game, 6),
+                Key::Space => {reset(&mut game); coin_placed=false},
                 _       => coin_placed = false
             }
 
@@ -145,31 +146,44 @@ fn main() {
         if let Some(args) = e.render_args() {
             app.render(&args, &game);
         }
+    }
+}
 
-        // if let Some(args) = e.update_args() {
-        //     app.update(&args);
-        // }
+fn reset(game: &mut GameStruct) {
+    game.player_turn = 0;
+    game.player_won = 0;
+    
+    for col in 0..MAXCOLUMNS {
+        for row in 0..MAXROWS {
+            game.board[col][row] = 0;
+        }
+    }
+}
+
+/// .
+// Harshini
+// check if column is full.
+// if full then return false (user needs to pick again)
+// else populate the coin on the board, using gravity.
+fn add_coin_to_column(game: &mut GameStruct, col: usize) -> bool {
+
+    // check if game is finished
+    if game.player_won != 0 {
+        return false;
     }
 
-    /// .
-    // Harshini
-    // check if column is full.
-    // if full then return false (user needs to pick again)
-    // else populate the coin on the board, using gravity.
-    fn add_coin_to_column(game: &mut GameStruct, col: usize) -> bool {
-        // check the col is not max and the column is not full
-        if col > MAXCOLUMNS-1 || game.board[col][MAXROWS-1] != 0 {
-            return false;
-        }
-
-        for n in 0..MAXROWS {
-            if game.board[col][n] == 0 { //if there is empty spot then make sure the coin takes the bottom empty spot
-                game.board[col][n] = game.player_turn;
-                break;
-            }
-        }
-        return true;
+    // check the col is not max and the column is not full
+    if col > MAXCOLUMNS-1 || game.board[col][MAXROWS-1] != 0 {
+        return false;
     }
+
+    for n in 0..MAXROWS {
+        if game.board[col][n] == 0 { //if there is empty spot then make sure the coin takes the bottom empty spot
+            game.board[col][n] = game.player_turn;
+            break;
+        }
+    }
+    return true;
 }
 
 /*
@@ -190,7 +204,7 @@ fn game_finished(game: &mut GameStruct) -> i32 {
     }
     // check for open columns
     for col in 0..7 {
-        if game.board[col][1] == 0 {
+        if game.board[col][5] == 0 {
             return 0
         }
     }
@@ -276,4 +290,4 @@ fn game_won(game: &mut GameStruct, player: i32) -> bool {
     }
     // Player did not win
     return false;
-}//
+}
